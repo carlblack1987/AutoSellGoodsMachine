@@ -443,6 +443,15 @@ namespace AutoSellGoodsMachine
             receiveDataThread.Start();
 
             #endregion
+
+            #region 樊晓孟20170406新增：加载被开启的正扫的支付方式
+
+            Thread loadPayMethodsThread = new Thread(new ThreadStart(LoadPayMethods));
+            loadPayMethodsThread.IsBackground = true;
+            loadPayMethodsThread.ApartmentState = ApartmentState.STA;
+            loadPayMethodsThread.Start();
+
+            #endregion
         }
 
         /// <summary>
@@ -1614,6 +1623,9 @@ namespace AutoSellGoodsMachine
             imgPrice.Visibility = System.Windows.Visibility.Visible;
 
             tbDownTime.Visibility = System.Windows.Visibility.Visible;
+
+            //樊晓孟20170406新增：显示正扫方式Logo
+            panelPayMethods.Visibility = System.Windows.Visibility.Visible;
 
             DispatcherHelper.SleepControl();
 
@@ -5167,6 +5179,115 @@ namespace AutoSellGoodsMachine
                     MessageBox.Show(ex.ToString());
                 }
             }
+        }
+
+        #endregion
+
+        #region 加载被允许的正扫支付方式
+
+        private void LoadPayMethods()
+        {
+            int payCount = 0;
+            double maxLogoHeight = 0;
+            bool alipayFlag = false, wechatFlag = false, unionpayFlag = false;
+            if (PubHelper.p_BusinOper.PaymentOper.CheckPaymentControl(BusinessEnum.PayMent.AliPay_Code))
+            {
+                payCount++;
+                alipayFlag = true;
+            }
+            if (PubHelper.p_BusinOper.PaymentOper.CheckPaymentControl(BusinessEnum.PayMent.WeChatCode))
+            {
+                payCount++;
+                wechatFlag = true;
+            }
+            if (PubHelper.p_BusinOper.PaymentOper.CheckPaymentControl(BusinessEnum.PayMent.QuickPass))
+            {
+                payCount++;
+                unionpayFlag = true;
+            }
+
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                panelPayMethods.Visibility = Visibility.Hidden;
+                panelPayMethods.Children.Clear();
+                panelPayMethods.RowDefinitions.Clear();
+                panelPayMethods.ColumnDefinitions.Clear();
+                AutoBulidPage.CreateColumn(this.panelPayMethods, payCount - 1);
+
+                //判断是否开启了支付宝支付
+                if (alipayFlag)
+                {
+                    PayMethodControl payControl = new PayMethodControl();
+                    this.panelPayMethods.Children.Add(payControl);
+                    payControl.SetValue(Grid.ColumnProperty, payCount-- - 1);
+                    BitmapImage bit = new BitmapImage(new Uri("pack://siteoforigin:,,,/Images/PaymentPic/Payment_AliPayCode.png"));
+                    payControl.imgPayLogo.Source = bit;
+                    maxLogoHeight = maxLogoHeight > payControl.imgPayLogo.Height ? maxLogoHeight : payControl.imgPayLogo.Height;
+                    payControl.imgPayLogo.Visibility = Visibility.Visible;
+                    payControl.MouseLeftButtonUp += new MouseButtonEventHandler(AliPayLogoClick);
+                }
+
+                //判断是否开启了微信支付
+                if (wechatFlag)
+                {
+                    PayMethodControl payControl = new PayMethodControl();
+                    this.panelPayMethods.Children.Add(payControl);
+                    payControl.SetValue(Grid.ColumnProperty, payCount-- - 1);
+                    BitmapImage bit = new BitmapImage(new Uri("pack://siteoforigin:,,,/Images/PaymentPic/Payment_WeChat.png"));
+                    payControl.imgPayLogo.Source = bit;
+                    maxLogoHeight = maxLogoHeight > payControl.imgPayLogo.Height ? maxLogoHeight : payControl.imgPayLogo.Height;
+                    payControl.imgPayLogo.Visibility = Visibility.Visible;
+                    payControl.MouseLeftButtonUp += new MouseButtonEventHandler(WeChatLogoClick);
+                }
+
+                //判断是否开启了银联支付
+                if (unionpayFlag)
+                {
+                    PayMethodControl payControl = new PayMethodControl();
+                    this.panelPayMethods.Children.Add(payControl);
+                    payControl.SetValue(Grid.ColumnProperty, payCount-- - 1);
+                    BitmapImage bit = new BitmapImage(new Uri("pack://siteoforigin:,,,/Images/PaymentPic/Payment_UnionPay.png"));
+                    payControl.imgPayLogo.Source = bit;
+                    maxLogoHeight = maxLogoHeight > payControl.imgPayLogo.Height ? maxLogoHeight : payControl.imgPayLogo.Height;
+                    payControl.imgPayLogo.Visibility = Visibility.Visible;
+                    payControl.MouseLeftButtonUp += new MouseButtonEventHandler(UnionPayLogoClick);
+                }
+
+                panelPayMethods.Height = maxLogoHeight + 120;
+            }));
+
+            
+
+        }
+
+        /// <summary>
+        /// 点击支付宝logo进行支付
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void AliPayLogoClick(object sender, MouseButtonEventArgs e)
+        {
+            
+        }
+
+        /// <summary>
+        /// 点击微信logo进行支付
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void WeChatLogoClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 点击银联logo进行支付
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void UnionPayLogoClick(object sender, MouseButtonEventArgs e)
+        {
+
         }
 
         #endregion

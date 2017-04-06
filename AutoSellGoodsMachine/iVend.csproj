@@ -116,6 +116,9 @@
     <Compile Include="Controls\CashControl.xaml.cs">
       <DependentUpon>CashControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PayMethodControl.xaml.cs">
+      <DependentUpon>PayMethodControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\VendBoxControl.xaml.cs">
       <DependentUpon>VendBoxControl.xaml</DependentUpon>
     </Compile>
@@ -208,6 +211,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ImageButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PayMethodControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

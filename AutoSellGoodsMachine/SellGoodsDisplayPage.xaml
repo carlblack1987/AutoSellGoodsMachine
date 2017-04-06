@@ -1209,7 +1209,7 @@
                     <TextBlock Text=""  x:Name="tbReturnCoin" FontSize="37"   VerticalAlignment="Center" Margin="0,0,0,8"  HorizontalAlignment="Center"  Foreground="White"></TextBlock>
 
                 </Grid>
-                
+
                 <Grid HorizontalAlignment="Center"  RenderTransformOrigin="0.5,0.5"
                       Margin="0,0,0,-640" x:Name="tbSetMoneyPanel"
                       VerticalAlignment="Center">
@@ -1231,7 +1231,11 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"  >
                     </TextBlock>
-                </Grid>
+
+                    <!--Image x:Name="imgPayMethods" Stretch="Fill" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Width="600" Height="170" Margin="0,0,0,-360"/-->
+
+                    <Grid  x:Name="panelPayMethods" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Width="600" Height="220" Margin="0,0,0,-420"></Grid>
+            </Grid>
 
                 <Path x:Name="ptGoodsContentDetailLine" Data="M0,734 L672,734" Fill="Yellow" Height="4" Margin="0,0,0,-1140" Stretch="Fill" Stroke="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 
