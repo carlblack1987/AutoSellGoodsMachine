@@ -37,6 +37,7 @@
                 <Button x:Name="AdvanCfg_Menu_ResetCfg" Content="恢复出厂参数" HorizontalAlignment="Left" Height="235" Margin="0" Style="{DynamicResource AdvanCfg_Menu_ResetCfg}" VerticalAlignment="Top" Width="192" FontSize="28" Foreground="White" Focusable="False" Cursor="Hand" Click="AdvanCfg_Menu_ResetCfg_Click" />
             </StackPanel>
             <StackPanel HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="768" Height="235" Orientation="Horizontal" RenderTransformOrigin="0,0">
+                <Button x:Name="AdvanCfg_Menu_CheckUpdate" Content="检查更新" HorizontalAlignment="Left" Height="235" Margin="0" Style="{DynamicResource AdvanCfg_Menu_Cancel}" VerticalAlignment="Top" Width="192" FontSize="28" Foreground="White" Focusable="False" Cursor="Hand" Click="AdvanCfg_Menu_CheckUpdate_Click" />
                 <Button x:Name="AdvanCfg_Menu_Cancel" Content="返回" HorizontalAlignment="Left" Height="235" Margin="0" Style="{DynamicResource AdvanCfg_Menu_Cancel}" VerticalAlignment="Top" Width="192" FontSize="28" Foreground="White" Focusable="False" Cursor="Hand" Click="AdvanCfg_Menu_Cancel_Click" />
             </StackPanel>
         </StackPanel>

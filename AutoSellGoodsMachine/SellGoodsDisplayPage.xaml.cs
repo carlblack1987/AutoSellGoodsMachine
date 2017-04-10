@@ -446,10 +446,10 @@ namespace AutoSellGoodsMachine
 
             #region 樊晓孟20170406新增：加载被开启的正扫的支付方式
 
-            Thread loadPayMethodsThread = new Thread(new ThreadStart(LoadPayMethods));
-            loadPayMethodsThread.IsBackground = true;
-            loadPayMethodsThread.ApartmentState = ApartmentState.STA;
-            loadPayMethodsThread.Start();
+            //Thread loadPayMethodsThread = new Thread(new ThreadStart(LoadPayMethods));
+            //loadPayMethodsThread.IsBackground = true;
+            //loadPayMethodsThread.ApartmentState = ApartmentState.STA;
+            //loadPayMethodsThread.Start();
 
             #endregion
         }
@@ -1219,6 +1219,11 @@ namespace AutoSellGoodsMachine
             tbSetMoneyPanel.Visibility = System.Windows.Visibility.Hidden;
 
             tbMainInfoPanel.Visibility = System.Windows.Visibility.Hidden;
+
+            //樊晓孟20170408新增：发送启动成功消息
+            Thread t = new Thread(new ParameterizedThreadStart(iVend_Message.SendData));
+            t.IsBackground = true;
+            t.Start(iVend_Message.WM_IVEND_STARTCOMPLETE);
         }
 
         /// <summary>
@@ -1439,6 +1444,9 @@ namespace AutoSellGoodsMachine
                 PubHelper.p_BusinOper.GoodsShowModelType = BusinessEnum.GoodsShowModelType.GoodsToMultiAsile;
             }
             ViewProductDetail("",false,false);
+
+            FrmAdvanCfg tmp = new FrmAdvanCfg();
+            tmp.Show();
         }
 
         /// <summary>
@@ -5141,7 +5149,7 @@ namespace AutoSellGoodsMachine
             {
                 try
                 {
-                    _pipeServer = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 2);
+                    _pipeServer = new NamedPipeServerStream(iVend_Message.pipeNameVend, PipeDirection.InOut, 2);
                     _pipeServer.WaitForConnection(); //Waiting
                     StreamReader sr = new StreamReader(_pipeServer);
                     string recData = sr.ReadLine();
@@ -5160,13 +5168,47 @@ namespace AutoSellGoodsMachine
                             }));
                         }
                         if ((PubHelper.p_BusinOper.OperStep == BusinessEnum.OperStep.Main) ||
-                        (PubHelper.p_BusinOper.OperStep == BusinessEnum.OperStep.InitErr))
+                        (PubHelper.p_BusinOper.OperStep == BusinessEnum.OperStep.InitErr) && PubHelper.p_BusinOper.TotalPayMoney == 0)
                         {
                             this.Dispatcher.Invoke(new Action(() =>
                             {
                                 this.Close();
+                                //关闭主窗口之后需要这样调用exit以强制退出进程
+                                System.Environment.Exit(0);
                             }));
                         }
+                    }
+                    //如果需要更新
+                    else if (recData == iVend_Message.WM_UPDATE_EXISTS.ToString())
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            PubHelper.p_MsgModel = "1";
+                            PubHelper.ShowMsgInfo("发现新版本，是否更新？", PubHelper.MsgType.YesNo);
+                            PubHelper.p_MsgModel = "0";
+                            if (PubHelper.p_MsgResult)
+                            {
+                                //进行更新
+                                Thread t = new Thread(new ParameterizedThreadStart(iVend_Message.SendData));
+                                t.IsBackground = true;
+                                t.Start(iVend_Message.WM_UPDATE_INITIATEGRANTED);
+                            }
+                            else
+                            {
+                                //取消更新
+                                Thread t = new Thread(new ParameterizedThreadStart(iVend_Message.SendData));
+                                t.IsBackground = true;
+                                t.Start(iVend_Message.WM_UPDATE_CANCEL);
+                            }
+                        }));
+                    }
+                    //如果不需要更新
+                    else if (recData == iVend_Message.WM_UPDATE_NOTEXISTS.ToString())
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            PubHelper.ShowMsgInfo("当前版本已是最新。", PubHelper.MsgType.Ok);
+                        }));
                     }
                     Thread.Sleep(1000);
                     sr.Close();
@@ -5176,8 +5218,29 @@ namespace AutoSellGoodsMachine
                 catch (Exception ex)
                 {
                     //Log.WriteLog(ex.Message, _logFile);
-                    MessageBox.Show(ex.ToString());
                 }
+            }
+        }
+
+        //发送消息给自动更新客户端
+        private void SendMessageToClient(object msg)
+        {
+            if (msg == "" || _pipeServer == null) return;
+            StreamWriter sw = new StreamWriter(_pipeServer);
+            try
+            {
+                sw.WriteLine(msg);
+                sw.Flush();
+                Thread.Sleep(1000);
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+            finally
+            {
+                sw.Close();
             }
         }
 
@@ -5255,8 +5318,6 @@ namespace AutoSellGoodsMachine
 
                 panelPayMethods.Height = maxLogoHeight + 120;
             }));
-
-            
 
         }
 

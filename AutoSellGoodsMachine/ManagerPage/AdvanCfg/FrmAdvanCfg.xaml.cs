@@ -10,6 +10,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Threading;
+using AutoSellGoodsMachine.Message;
 
 namespace AutoSellGoodsMachine
 {
@@ -248,6 +250,18 @@ namespace AutoSellGoodsMachine
             FrmAdvanCfg_Reset frmAdvanCfg_Reset = new FrmAdvanCfg_Reset();
             frmAdvanCfg_Reset.ShowDialog();
             this.Opacity = PubHelper.OPACITY_NORMAL;
+        }
+
+        /// <summary>
+        /// 菜单—检查更新
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AdvanCfg_Menu_CheckUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            Thread t = new Thread(new ParameterizedThreadStart(iVend_Message.SendData));
+            t.IsBackground = true;
+            t.Start(iVend_Message.WM_UPDATE_CHECKREQUIRE);
         }
 
         /// <summary>

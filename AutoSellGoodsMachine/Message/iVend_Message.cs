@@ -25,10 +25,20 @@ namespace AutoSellGoodsMachine.Message
         public const int WM_UPDATE_DOWNLOADCOMPLETED = USER + 104;
         //可以开始更新
         public const int WM_UPDATE_INITIATEGRANTED = USER + 105;
+        //请求检查更新
+        public const int WM_UPDATE_CHECKREQUIRE = USER + 106;
+        //iVend启动完成
+        public const int WM_IVEND_STARTCOMPLETE = USER + 107;
+        //取消更新
+        public const int WM_UPDATE_CANCEL = USER + 108;
         /// <summary>
-        /// 通信命名管道名称
+        /// 以售货机为服务端的通信命名管道名称
         /// </summary>
-        public const string pipeName = "iVendPipe";
+        public const string pipeNameVend = "iVendPipe";
+        /// <summary>
+        /// 以更新程序为服务端的通信命名管道名称
+        /// </summary>
+        public const string pipeNameUpdate = "iVendPipe2";
 
         [DllImport("User32.dll", EntryPoint = "SendMessage")]
         public static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
@@ -108,7 +118,7 @@ namespace AutoSellGoodsMachine.Message
         {
             try
             {
-                NamedPipeClientStream _pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.None, System.Security.Principal.TokenImpersonationLevel.Impersonation);
+                NamedPipeClientStream _pipeClient = new NamedPipeClientStream(".", pipeNameUpdate, PipeDirection.InOut, PipeOptions.None, System.Security.Principal.TokenImpersonationLevel.Impersonation);
                 _pipeClient.Connect();
                 StreamWriter sw = new StreamWriter(_pipeClient);
                 sw.WriteLine(msg);
